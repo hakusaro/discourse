@@ -2,6 +2,10 @@ function escapeRegexp(text) {
   return text.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&").replace(/\*/g, "S*");
 }
 
+function createCensorRegexp(patterns) {
+  return new RegExp(`((?<!\\w)(?:${patterns.join("|")}))(?!\\w)`, "ig");
+}
+
 export function censorFn(
   censoredWords,
   replacementLetter,
@@ -28,10 +32,8 @@ export function censorFn(
           "ig"
         );
       } else {
-        censorRegexp = new RegExp(
-          "(\\b(?:" + patterns.join("|") + ")\\b)(?![^\\(]*\\))",
-          "ig"
-        );
+        censorRegexp = createCensorRegexp(patterns);
+        console.log(censorRegexp);
       }
 
       if (censorRegexp) {
@@ -53,10 +55,7 @@ export function censorFn(
                   replacementLetter
                 );
                 text = text.replace(
-                  new RegExp(
-                    `(\\b${escapeRegexp(m[0])}\\b)(?![^\\(]*\\))`,
-                    "ig"
-                  ),
+                  createCensorRegexp([escapeRegexp(m[0])]),
                   replacement
                 );
               }
